@@ -1,30 +1,34 @@
 ﻿using Microsoft.Xrm.Sdk;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace Playground.Library.CrmTypeConverter
 {
-    public class CrmValueTypeDecorator<T> where T : class, new()
+    public static class CrmValueTypeDecorator<TInput, TOutput> where TInput : class, new() 
+                                                        where TOutput : struct
     {
         private static Type[] ValidTypes = new[] { typeof(Money), typeof(OptionSetValue), typeof(EntityReference) };
 
         private static string[] ValidTypeNames = ValidTypes.Select(t => t.Name).ToArray();
 
-        public T Value { get; }
+        private static Func<TInput, TOutput> GetValueFn;
 
-        public CrmValueTypeDecorator(T obj)
+        static CrmValueTypeDecorator()
         {
-            this.AssertIsCrmType(obj);
-
-
-
-
+            ParameterExpression paramExpr = Expression.Parameter(typeof(TInput), "x");
+            Expression propertyExpr = Expression.Property(paramExpr, "Value");
+            GetValueFn = Expression.Lambda<Func<TInput, TOutput>>(propertyExpr, paramExpr).Compile();
         }
 
-        private void AssertIsCrmType(T obj)
+        public static TOutput GetValue(TInput obj)
+        {
+            AssertIsCrmType(obj);
+
+            return GetValueFn(obj);
+        }
+
+        private static void AssertIsCrmType(TInput obj)
         {
             bool isCrmType = ValidTypes.Any(t => t == obj.GetType());
 

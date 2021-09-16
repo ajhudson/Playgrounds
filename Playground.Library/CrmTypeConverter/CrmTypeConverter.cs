@@ -1,21 +1,19 @@
 ﻿using Microsoft.Xrm.Sdk;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Playground.Library.CrmTypeConverter
 {
-    public class CrmTypeConverter<T> : IConvertible where T : class, new()
+    public class CrmTypeConverter<TInput, TOutput> : IConvertible   where TInput : class, new() 
+                                                                    where TOutput : IConvertible
     {
         private static Type[] ValidTypes = new[] { typeof(Money), typeof(OptionSetValue), typeof(EntityReference) };
 
         private static string[] ValidTypeNames = ValidTypes.Select(t => t.Name).ToArray();
 
-        private readonly T _object;
+        private readonly TInput _object;
 
-        public CrmTypeConverter(T obj)
+        public CrmTypeConverter(TInput obj)
         {
             bool isCrmType = ValidTypes.Any(t => t == obj.GetType());
 
@@ -23,6 +21,8 @@ namespace Playground.Library.CrmTypeConverter
             {
                 throw new InvalidCastException($"{nameof(obj)} must be one of the followin types: {string.Join(", ", ValidTypeNames)}");
             }
+
+            this._object = obj;
         }
 
         public TypeCode GetTypeCode()

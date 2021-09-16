@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xrm.Sdk;
 using NUnit.Framework;
+using Playground.Library.CrmTypeConverter;
 using Shouldly;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,31 @@ namespace Playground.UnitTests.CrmTypeConverterTests
             int val = compiledFn(optionSetValue);
 
             val.ShouldBe(512);
+        }
+
+        [Test]
+        public void ShouldGetOptionSetValueUsingHelper()
+        {
+            var optionSetValue = new OptionSetValue(876);
+            int optionSetValueResult = CrmValueTypeDecorator<OptionSetValue, int>.GetValue(optionSetValue);
+            optionSetValueResult.ShouldBe(876);
+        }
+
+        [Test]
+        public void ShouldGetMoneyValueUsingHelper()
+        {
+            var money = new Money(34.56m);
+            decimal moneyResult = CrmValueTypeDecorator<Money, decimal>.GetValue(money);
+            moneyResult.ShouldBe(34.56m);
+        }
+
+        [Test]
+        public void ShouldGetEntityReferenceValueUsingHelper()
+        {
+            Guid id = Guid.Parse("666879EA-050E-4A35-AFA6-CEAA9EEF0B1D");
+            var entityRef = new EntityReference("account", id);
+            Guid entityRefResult = CrmValueTypeDecorator<EntityReference, Guid>.GetValue(entityRef);
+            entityRefResult.ShouldBe(id);
         }
     }
 }
