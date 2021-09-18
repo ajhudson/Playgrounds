@@ -2,7 +2,7 @@
 {
     public static class HalsteadStatExample
     {
-        public static void AlterValue(int value)
+        public static int AlterValue(int value)
         {
             if (value != 0)
             {
@@ -16,6 +16,8 @@
                         value -= 1;
                 }
             }
+
+            return value;
         }
     }
 }

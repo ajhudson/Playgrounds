@@ -1,6 +1,4 @@
-﻿using 
-
-namespace Playground.Console
+﻿ namespace Playground.Console
 {
     class Program
     {
